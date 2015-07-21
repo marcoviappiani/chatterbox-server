@@ -31,7 +31,10 @@ exports.requestHandler = function(request, response) {
 
   // The outgoing status.
   var statusCode;
-  var body;
+  var jsonObject = {
+    message: "",
+    results: []
+  }; 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
   // Tell the client we are sending them plain text.
@@ -40,6 +43,11 @@ exports.requestHandler = function(request, response) {
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "application/JSON";
   
+  if(request.url === undefined) {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(jsonObject));
+  }
 
   if(request.method === 'GET') {
     statusCode = 200;
@@ -56,19 +64,14 @@ exports.requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
 
-    body = "Hello, Wordl!";
-    var jsonObject = JSON.stringify({
-      message: body,
-      results: []
-    }); 
-    // console.log(response);
-    response.end(jsonObject);
+    jsonObject.message = "Hello, World!";
+    response.end(JSON.stringify(jsonObject));
   }
 
-  // console.log(request);
   if(request.method === 'POST'){
     statusCode = 201;
     response.writeHead(statusCode, headers);
+    var body;
     body = '';
       // we want to get the data as utf8 strings
       // If you don't set an encoding, then you'll get Buffer objects
@@ -77,27 +80,30 @@ exports.requestHandler = function(request, response) {
       // Readable streams emit 'data' events once a listener is added
       request.on('data', function (chunk) {
         body += chunk;
-        console.log(body);
+        // console.log(body);
       });
 
       // the end event tells you that you have entire body
       request.on('end', function () {
         try {
           var data = JSON.parse(body);
-          results.push(data);
+          jsonObject.results.push(data);
+          // console.log(JSON.parse(body).results);
+          // console.log(data);
         } catch (er) {
           // uh oh!  bad json!
-          response.statusCode = 400;
+          response.statusCode = 400;   // this is probably wrong - need to fix it at some point
           return response.end('error: ' + er.message);
         }
 
         // write back something interesting to the user:
+        console.log(response);
         response.write(typeof data);
-        response.end();
+        response.end(JSON.stringify(jsonObject));
       });
   }
-
 };
+
 
 // exports.send = function () {
 
