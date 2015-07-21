@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 var results = [];
-var validUrls = ['/classes/messages','/classes/room1','/classes/chatterbox'];
+// var validUrls = ['/classes/messages','/classes/room1','/classes/chatterbox'];
 
 // http://127.0.0.1:3000/classes/messages/?order=-createdAt.
 // indexOf(searchvalue, from index)
@@ -39,12 +39,12 @@ exports.requestHandler = function(request, response) {
  
   headers['Content-Type'] = "application/JSON";
   
-  if(validUrls.indexOf(request.url) === -1) {
+  if(request.url.indexOf("classes") === -1) {
     statusCode = 404;
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(jsonObject));
 
-  } else if(request.method === 'GET') {
+  } else if(request.method === 'GET' || request.method === 'OPTIONS') {
     statusCode = 200;
     response.writeHead(statusCode, headers);
     jsonObject.message = "Hello, World!";
@@ -71,7 +71,6 @@ exports.requestHandler = function(request, response) {
       }
       response.end(JSON.stringify(jsonObject));
     });
-
   }
 };
 

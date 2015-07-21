@@ -5,9 +5,9 @@ $(function() {
   app = {
 //TODO: The current 'addFriend' function just adds the class 'friend'
 //to all messages sent by the user
-    server: 'https://api.parse.com/1/classes/chatterbox/',
+    server: 'http://127.0.0.1:3000/classes/messages/',
     username: 'anonymous',
-    roomname: 'lobby',
+    roomname: 'Lobby',
     lastMessageId: 0,
     friends: {},
 
@@ -29,6 +29,7 @@ $(function() {
 
       // Fetch previous messages
       app.startSpinner();
+      app.populateRooms();
       app.fetch(false);
 
       // Poll for new messages
@@ -60,12 +61,16 @@ $(function() {
         url: app.server,
         type: 'GET',
         contentType: 'application/json',
-        data: { order: '-createdAt'},
+        data: {order: '-createdAt'},
         success: function(data) {
+          data = JSON.parse(data);
           console.log('chatterbox: Messages fetched');
-
+          console.log(data);
           // Don't bother if we have nothing to work with
-          if (!data.results || !data.results.length) { return; }
+          if (!data.results || !data.results.length) { 
+            app.stopSpinner();
+            return; 
+          }
 
           // Get the last message
           var mostRecentMessage = data.results[data.results.length-1];
@@ -113,7 +118,7 @@ $(function() {
       }
     },
     populateRooms: function(results) {
-      app.$roomSelect.html('<option value="__newRoom">New room...</option><option value="" selected>Lobby</option></select>');
+      app.$roomSelect.html('<option value="__newRoom">New room...</option><option value="'+ app.roomname + '" selected>'+ app.roomname +'</option></select>');
 
       if (results) {
         var rooms = {};
@@ -161,7 +166,7 @@ $(function() {
         $message.text(data.text).appendTo($chat);
 
         // Add the message to the UI
-        app.$chats.append($chat);
+        app.$chats.prepend($chat);
       }
     },
     addFriend: function(evt) {
@@ -212,7 +217,8 @@ $(function() {
       var message = {
         username: app.username,
         text: app.$message.val(),
-        roomname: app.roomname || 'lobby'
+        roomname: app.roomname || 'lobby',
+        objectId: app.lastMessageId +1
       };
 
       app.send(message);
