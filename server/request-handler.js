@@ -13,10 +13,20 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 var results = [];
-var validUrls = ['/classes/messages','/classes/room1',];
+var validUrls = ['/classes/messages','/classes/room1','/classes/chatterbox'];
+
+// http://127.0.0.1:3000/classes/messages/?order=-createdAt.
+// indexOf(searchvalue, from index)
+
 
 
 exports.requestHandler = function(request, response) {
+
+  // var pos1 = request.url.indexOf("/", 7);
+  // var pos2 = request.url.lastIndexOf("/");
+  // var subString = request.url.substring(pos1, pos2);
+  // console.log(subString);
+  // console.log(request.url);
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   var statusCode;
@@ -33,7 +43,7 @@ exports.requestHandler = function(request, response) {
     statusCode = 404;
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(jsonObject));
-    
+
   } else if(request.method === 'GET') {
     statusCode = 200;
     response.writeHead(statusCode, headers);
@@ -56,7 +66,7 @@ exports.requestHandler = function(request, response) {
         var data = JSON.parse(body);
         results.push(data);
       } catch (er) {
-        response.statusCode = 400;   // this is probably wrong - need to fix it at some point
+        response.statusCode = 400;   
         return response.end('error: ' + er.message);
       }
       response.end(JSON.stringify(jsonObject));
