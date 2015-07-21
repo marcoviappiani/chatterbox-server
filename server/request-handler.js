@@ -55,6 +55,7 @@ var requestHandler = function(request, response) {
   response.end("Hello, World!");
 };
 
+
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
 // are on different domains, for instance, your chat client.
@@ -70,4 +71,10 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
+exports.handleRequest = requestHandler;
+
+
+
+
 
